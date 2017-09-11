@@ -1,0 +1,279 @@
+<html>
+<head>
+	<script src="./js/vue.js"></script>
+  <script src="./js/vuex.js"></script>
+  <script src="./js/jquery-3.2.1.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="./css/app.css">
+</head>
+<!-- template for the modal component -->
+<script type="text/x-template" id="modal-template">
+  <transition name="modal">
+    <div class="modal-mask">
+      <div class="modal-wrapper">
+        <div class="modal-container">
+
+          <div class="modal-header">
+            <slot name="header">
+              Modify {{ players[currentPlayer].name }}
+            </slot>
+          </div>
+
+          <div class="modal-body">
+            <slot name="body">
+              Init: <input type="text" id="init2" :value="players[currentPlayer].init"><br/>
+              Bonus: <input type="text" id="bonus2" :value="players[currentPlayer].bonus" >
+            </slot>
+          </div>
+
+          <div class="modal-footer">
+            <slot name="footer">
+              
+              <button class="modal-default-button" v-on:click="save();" @click="$emit('close')">
+                OK
+              </button>
+            </slot>
+          </div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</script>
+
+<body>
+Add Player:<br/>
+Name: <input type="text" id="name">  Init: <input type="text" id="init"> Bonus: <input type="text" id="bonus">
+<button type="button" id="addPlayer" onclick="addPlayer()">Add</button>
+<br/>
+
+<div id="app4" style="padding-top:10px">
+
+  <div style="float:left;min-width:300px;" >
+  <table border="1">
+    <tr>
+       <th>Character</th>
+       <th>Init</th>
+       <th>Bonus</th>
+    </tr>
+    <tr v-for="(player, index) in players" >
+      <td v-bind:class="{ active: readyPlayer(index) }" v-on:click="openModal(index)">{{ player.name }}</td> <td v-on:click="openModal(index)"> {{ player.init }}</td> <td v-on:click="openModal(index)">{{ player.bonus }}</td>
+    </tr>
+  </table>
+  </div>
+  <div style="margin-left:20px;float:left;">
+      <button type="button" v-on:click="showNextPlayer()" style="margin-bottom:5px;">Fight!</button><br/>
+      Round: {{ round }}
+  </div>
+  <div style="float:left;border:1px solid black;margin-left:20px;">
+     Conditions:<br/>
+     Add Condition:<br/>
+        Name: <input type="text" id="player">  Condition: <input type="text" id="conName"> Total Rounds: <input type="text" id="rounds">
+        <button type="button" id="addPlayer" v-on:click="addCondition()">Add</button>
+        <br/>
+
+     <table border="1">
+    <tr>
+       <th>Character</th>
+       <th>Condition</th>
+       <th>Rounds Active</th>
+       <th>Total Rounds</th>
+
+    </tr>
+    <tr v-for="condition in conditions" >
+      <td>{{ condition.player }}</td> <td> {{ condition.name }}</td> <td>{{ condition.active }}</td> <td>{{ condition.total }}</td>
+    </tr>
+  </table>
+  </div>
+  <div style="clear:both;"><p>
+  <button type="button" v-on:click="reset()">Reset Characters</button> &nbsp; <button type="button" v-on:click="clear()">Clear Characters</button>
+  </p>
+  </div>
+  <modal v-if="showModal" @close="showModal = false">
+
+  </modal>
+</div>
+
+<script type="text/javascript">
+const store = new Vuex.Store({
+  state: {
+    count: 0,
+    players: [],
+    currentPlayer: 0,
+    playerUp: -1,
+    round: 1,
+    conditions: []
+  },
+  mutations: {
+    increment (state) {
+      state.count++
+    },
+    addPlayer(state) {
+      state.players.push({ name: $('#name').val(), init: $('#init').val(), bonus: $('#bonus').val() });
+      state.players.sort(function(a, b){return sortPlayers(a,b)});
+      $('#name').val('');
+      $('#init').val('');
+      $('#bonus').val('');
+
+    },
+    setCurrentPlayer(state, n) {
+      state.currentPlayer = n;
+    },
+    updatePlayer(state, n) {
+      state.players[state.currentPlayer].bonus = n.bonus;
+      state.players[state.currentPlayer].init = n.init;
+      state.players.sort(function(a, b){return sortPlayers(a,b)});
+    },
+    reset(state) {
+      var arrayLength = state.players.length;
+      for (var i = 0; i < arrayLength; i++) {
+         state.players[i].bonus=0;
+         state.players[i].init=0;
+      } 
+      state.playerUp = -1;
+      state.round = 1;
+      state.conditions = [];
+    },
+    clear(state) {
+      state.players = [];
+      state.playerUp = -1;
+      state.round = 1;
+      state.conditions = [];
+    },
+    changePlayer(state) {
+      state.playerUp++;
+      if(state.playerUp < state.players.length) {
+        
+      } else {
+        state.playerUp = 0;
+        state.round++;
+        updateConditions();
+      }
+      
+    },
+    addCondition(state) {
+      state.conditions.push({ player: $('#player').val(), name: $('#conName').val(), total: $('#rounds').val(), active:0 });
+      $('#player').val('');
+      $('#conName').val('');
+      $('#rounds').val('');
+
+    }
+    
+  },
+  actions: {
+    addPlayer (context) {      
+      context.commit('addPlayer');
+    },
+    setCurrentPlayer (context, n) {
+      context.commit('setCurrentPlayer', n);
+    },
+    updatePlayer (context, n) {
+      context.commit('updatePlayer', n);
+    },
+    addCondition(context) {
+      context.commit('addCondition');
+    }
+  }
+})
+
+
+Vue.component('modal', {
+  template: '#modal-template',
+  store,
+  methods: { 
+    save: function() {
+      store.dispatch('updatePlayer', {
+        init: $('#init2').val(),
+        bonus: $('#bonus2').val()
+      })
+      //store.players.sort(function(a, b){return sortPlayers(a,b)});
+    }
+  },
+  computed: {
+    players () {
+      return this.$store.state.players;
+    },
+    currentPlayer() {
+      return this.$store.state.currentPlayer;
+    }
+  }
+})
+
+var app4 = new Vue({
+  el: '#app4',
+  store,
+  data: {
+    showModal: false
+  },
+  methods: {
+    openModal(index) {
+       app4.showModal = true;
+       store.dispatch('setCurrentPlayer', index);
+    },
+    reset: function() {
+       store.commit('reset');
+    },
+    clear: function() {
+       store.commit('clear');
+    },
+    showNextPlayer() {
+       store.commit('changePlayer');
+    },
+    readyPlayer(index) {
+      if(index == this.$store.state.playerUp) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    addCondition() {
+      store.dispatch('addCondition');
+    }
+
+  },
+  computed: {
+    players () {
+      return this.$store.state.players;
+    },
+    currentPlayer() {
+
+      return this.$store.state.currentPlayer;
+    },
+    round() {
+      return this.$store.state.round;
+    },
+    conditions() {
+      return this.$store.state.conditions;
+    }
+  }
+
+})
+
+var itemNum = 4;
+var addPlayer = function() {
+	store.dispatch('addPlayer');
+}
+
+var sortPlayers = function(a, b) {
+  if(b.init==a.init) {
+        return b.bonus-a.bonus;
+    } else {
+      return b.init-a.init;
+    }
+
+}
+var updateConditions = function() {
+   var arrayLength = store.state.conditions.length;
+    for (var i = 0; i < arrayLength; i++) {
+      if(store.state.conditions[i].active < store.state.conditions[i].total) {        
+       store.state.conditions[i].active++;
+      } else {
+        store.state.conditions.splice(i,1);
+      }
+    }
+}
+</script>
+
+
+
+
+</body>
+</html>
