@@ -1,0 +1,106 @@
+[{
+    "name": "Acrobatics",
+    "url": "acrobatics.html"
+}, {
+    "name": "Appraise",
+    "url": "appraise.html"
+}, {
+    "name": "Bluff",
+    "url": "bluff.html"
+}, {
+    "name": "Climb",
+    "url": "climb.html"
+}, {
+    "name": "Craft",
+    "url": "craft.html"
+}, {
+    "name": "Diplomacy",
+    "url": "diplomacy.html"
+}, {
+    "name": "Disable Device",
+    "url": "disabledevice.html"
+}, {
+    "name": "Disguise",
+    "url": "disguise.html"
+}, {
+    "name": "Escape Artist",
+    "url": "escapeartist.html"
+}, {
+    "name": "Fly",
+    "url": "fly.html"
+}, {
+    "name": "Handle Animal",
+    "url": "handleanimal.html"
+}, {
+    "name": "Heal",
+    "url": "heal.html"
+}, {
+    "name": "Intimidate",
+    "url": "intimidate.html"
+}, {
+    "name": "Knowledge (arcana)",
+    "url": "knowledge.html"
+}, {
+    "name": "Knowledge (dungeoneering)",
+    "url": "knowledge.html"
+}, {
+    "name": "Knowledge (engineering)",
+    "url": "knowledge.html"
+}, {
+    "name": "Knowledge (geography)",
+    "url": "knowledge.html"
+}, {
+    "name": "Knowledge (history)",
+    "url": "knowledge.html"
+}, {
+    "name": "Knowledge (local)",
+    "url": "knowledge.html"
+}, {
+    "name": "Knowledge (nature)",
+    "url": "knowledge.html"
+}, {
+    "name": "Knowledge (nobility)",
+    "url": "knowledge.html"
+}, {
+    "name": "Knowledge (planes)",
+    "url": "knowledge.html"
+}, {
+    "name": "Knowledge (religion)",
+    "url": "knowledge.html"
+}, {
+    "name": "Linguistics",
+    "url": "linguistics.html"
+}, {
+    "name": "Perception",
+    "url": "perception.html"
+}, {
+    "name": "Perform",
+    "url": "perform.html"
+}, {
+    "name": "Profession",
+    "url": "profession.html"
+}, {
+    "name": "Ride",
+    "url": "ride.html"
+}, {
+    "name": "Sense Motive",
+    "url": "sensemotive.html"
+}, {
+    "name": "Sleight of Hand",
+    "url": "sleightofhand.html"
+}, {
+    "name": "Spellcraft",
+    "url": "spellcraft.html"
+}, {
+    "name": "Stealth",
+    "url": "stealth.html"
+}, {
+    "name": "Survival",
+    "url": "survival.html"
+}, {
+    "name": "Swim",
+    "url": "swim.html"
+}, {
+    "name": "Use Magic Device",
+    "url": "umd.html"
+}]

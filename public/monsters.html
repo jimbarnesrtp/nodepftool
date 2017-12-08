@@ -1,0 +1,443 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<script src="./js/vue.js"></script>
+  <script src="./js/vuex.js"></script>
+  <script src="./js/jquery-3.2.1.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="./css/app.css">
+   <link rel="stylesheet" type="text/css" href="./css/foundation.css">
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script type="text/x-template" id="skill-modal">
+    <transition name="skill-modal" >
+        <div class="modal-mask">
+          <div class="modal-wrapper">
+            <div class="modal-container">
+  
+              <div class="modal-header">
+                  <slot name="header">
+                      <button class="modal-default-button" @click="$emit('close')">
+                        Close
+                      </button>
+                    </slot>
+              </div>
+              <div class="modal-body">
+                  <slot name="body">
+                      <iframe style="min-width:600px;min-height:400px;" width="100%" height="100%" :src="modalskill.url" frameborder="1" allowfullscreen></iframe>
+                  </slot>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+  
+  </script>
+  <script type="text/x-template" id="feat-modal">
+    
+        <transition name="feat-modal" >
+          <div class="modal-mask">
+            <div class="modal-wrapper">
+              <div class="modal-container">
+    
+                <div class="modal-header">
+                  <slot name="header">
+                    <b>Name:</b>{{modalfeat.name}} <button class="modal-default-button" @click="$emit('close')">
+                      Close
+                    </button>
+                  </slot>
+                </div>
+    
+                <div class="modal-body">
+                  <slot name="body">
+                    <b>Type:</b> {{modalfeat.type}} <br/>
+                    <span v-if="modalfeat.description"><b>Description:</b> {{modalfeat.description}}<br/></span>
+                    <span v-if="modalfeat.prereq"><b>Pre-Requisite:</b> {{modalfeat.prereq}}<br/></span>
+                    <span v-if="modalfeat.prerequisiteFeats"><b>Pre-Requisite Feats:</b> {{modalfeat.rerequisiteFeats}}<br/></span>
+                    <span v-if="modalfeat.prerequisiteSkills"><b>Pre-Requisite Feats:</b> {{modalfeat.rerequisiteSkills}}<br/></span>
+                    <b>Benefit:</b> {{modalfeat.benefit}}  <br/>
+                    <span v-if="modalfeat.normal"><b>Normal:</b> {{modalfeat.normal}}<br/></span>
+                    <span v-if="modalfeat.special"><b>Special:</b> {{modalfeat.special}}<br/></span>
+                    <span v-if="modalfeat.Teamwork"><b>Teamwork</b></span> <span v-if="modalfeat.critical"><b>Critical</b></span> <span v-if="modalfeat.grit"><b>Grit</b></span>
+                    <span v-if="modalfeat.style"><b>Style</b></span> <span v-if="modalfeat.performance"><b>Performance</b></span> <span v-if="modalfeat.multiples"><b>Multiples</b></span>
+                    <span v-if="modalfeat.panache"><b>Panache</b></span> <span v-if="modalfeat.betrayal"><b>Betrayal</b></span> <span v-if="modalfeat.targetting"><b>Targetting</b></span></br>
+                    <span v-if="modalfeat.racial"><b>Racial:</b> {{modalfeat.raceName}}</br></span>
+                    <span v-if="modalfeat.goal"><b>Racial:</b> {{modalfeat.goal}}</br></span>
+                    <span v-if="modalfeat.racial"><b>Racial:</b> {{modalfeat.raceName}}</br></span>
+                    <span v-if="modalfeat.completionBonus"><b>Completion Bonus:</b> {{modalfeat.completionBonus}}</br></span>
+                    Source: {{modalfeat.source}}<br/>
+                    <br/>
+                    
+    
+                  </slot>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+        </transition>
+    </script>
+    <script type="text/x-template" id="spell-modal">
+      
+          <transition name="spell-modal" >
+            <div class="modal-mask">
+              <div class="modal-wrapper">
+                <div class="modal-container">
+      
+                  <div class="modal-header">
+                    <slot name="header">
+                      <b>Name:</b>{{modalspell.name}} <button class="modal-default-button" @click="$emit('close')">
+                        Close
+                      </button>
+                    </slot>
+                  </div>
+      
+                  <div class="modal-body">
+                    <slot name="body">
+                      <b>School:</b> {{modalspell.school}} <span v-if="modalspell.subschool"><b>Sub School:</b> {{modalspell.subschool}}</span><br/>
+                      <span v-if="modalspell.descriptor"><b>Descriptor:</b> {{modalspell.descriptor}}<br/></span>
+                      <b>Cast Time:</b> {{modalspell.casting_time}}<br/>
+                      <b>Range:</b> {{modalspell.range}}  <span v-if="modalspell.area"><b>Area:</b> {{modalspell.area}}</span><br/>
+                      <span v-if="modalspell.targets"><b>Targets:</b> {{modalspell.targets}}<br/></span>
+                      <span v-if="modalspell.effect"><b>Effect:</b> {{modalspell.effect}}<br/></span>
+                      <span style="font-size:18px;font-weight:700" v-if="modalspell.effect" >TLDR;</span> {{modalspell.short_description}}<br/>
+                      <b>Components:</b> <span v-for="comp in modalspell.components"> {{comp}},</span></br/>
+                      <div v-if="modalspell.domain"><b>Domain:</b> <span v-for="dom in modalspell.domain"> {{dom}}</span><br/></div>
+                      <b>Duration:</b> {{modalspell.duration}}<br/>
+                      <b>Saving Throw:</b> {{modalspell.saving_throw}}  <b>Spell Resistence:</b> {{modalspell.spell_resistence}}<br/>
+                      <b>Dismissible:</b> {{modalspell.dismissible}}<br/>
+                      <b>Shapeable:</b> {{modalspell.shapeable}}<br/>
+                      <b>Description:</b> {{modalspell.description}}<br/>
+                      <br/>
+                      <div v-if="modalspell.mythic_text"><b>Mythic Effect:</b> {{modalspell.mythic_text}}</div>
+                      <br/>
+                      Source: {{modalspell.source}}<br/>
+                      <br/>
+                      
+      
+                    </slot>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+          </transition>
+      </script>
+<title>Monster Tool</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+<div class="container" id="app">
+<div class="row">
+	<div class="medium-3 column">
+       <br>
+       <label>Start typing to search monsters
+        <input id="monsterFilter" v-model="monsterFilter" type="text" placeholder="Monster Name"  v-on:keyup="filterMonsters()" @change="filterMonsters()"/>
+      </label>
+  </div>
+  <div class="medium-3 column">
+    <br>
+    Filter by CR
+    <select id="class" v-model="crSelected" @change="filterByCR()">
+      <option value="">CR</option>
+      <option  v-for="cr in crs" v-bind:value="cr"> {{ cr }} </option>
+    </select>
+  </div>
+  <div class="medium-3 column">
+    <br>
+    Filter by Type
+    <select id="class" v-model="typeSelected" @change="filterByType()">
+      <option value="">Type</option>
+      <option  v-for="type in types" v-bind:value="type"> {{ type }} </option>
+    </select>
+  </div>
+  <div class="medium-3 column">
+    <br>
+    Filter by Environment
+    <select id="class" v-model="envSelected" @change="filterByEnv()">
+      <option value="">Environment</option>
+      <option  v-for="env in envs" v-bind:value="env"> {{ env }} </option>
+    </select>
+  </div>
+    
+</div>
+<div class="row">
+  <div class="medium-2">
+      <div>
+        <span v-for="monster in currentMonsters" v-if="currentMonsters.length > 0" v-on:click="loadMonster(monster)">{{monster.name}} <br/></span>
+      </div>
+  </div>
+  <div class="medium-10" v-if="chosenMonster">
+   
+      <h4> {{chosenMonster.name}}</h4> 
+      <b>XP:</b> {{chosenMonster.xp}} <b>CR:</b> {{chosenMonster.cr}} <br/> 
+      {{chosenMonster.alignment}} {{chosenMonster.size}} {{chosenMonster.type}} {{chosenMonster.subType}}<br/>
+      <b>Init:</b> <span v-if="chosenMonster.ref > 0">+</span>{{chosenMonster.init}}; <b>Senses:</b> {{chosenMonster.senses}}<br/>
+      <b>Aura:</b>{{chosenMonster.aura}}<br/>
+      <h4 class="monsterh4">DEFENSE</h4>
+      <b>AC:</b> <span v-for="ac in chosenMonster.ac">{{ac}},</span> {{chosenMonster.acMods}}<br/>
+      <b>HP:</b> {{chosenMonster.hp}} {{chosenMonster.hd}}<br/>
+      <b>Saves:</b> Fort: <span v-if="chosenMonster.fort > 0">+</span>{{chosenMonster.fort}} Ref:<span v-if="chosenMonster.ref > 0">+</span>{{chosenMonster.ref}}
+      Will: <span v-if="chosenMonster.will > 0">+</span>{{chosenMonster.will}}<br/>
+      <b>DR:</b> {{chosenMonster.dr}}<br/>
+      <b>Immunities:</b> {{chosenMonster.immune}}<br/>
+      <b>Resist:</b> {{chosenMonster.resist}}<br/>
+      <b>Weakness:</b> {{chosenMonster.weakness}}<br/>
+
+      <h4 class="monsterh4">OFFENSE</h4>
+      <b>Speed:</b> {{chosenMonster.speed}}<br/>
+      <b>Melee:</b> {{chosenMonster.melee}}<br/>
+      <b>Ranged:</b>  {{chosenMonster.ranged}}<br/>
+      <b>Space:</b>  {{chosenMonster.space}}<br/>
+      <b>Reach:</b>  {{chosenMonster.reach}}<br/>
+      <b>Special Attacks:</b>  {{chosenMonster.SpecialAttacks}}<br/>
+      <span v-if="chosenMonster.spellLikeAbilities"><b>Spell Like Abilities</b><br/></span>
+      <div style="margin-left:15px;" v-if="chosenMonster.spellLikeAbilities">
+        <div v-for="sla in chosenMonster.spellLikeAbilities"><b>{{sla.name}} {{sla.casterLevel}} {{sla.concentration}}</b> <span style="text-decoration:underline;color:blue;margin-right: 5px;" v-on:click="openModalSpell(spell)" v-for="spell in sla.abilities">{{spell.trim()}}</span></div>
+      </div>
+
+      <span v-if="chosenMonster.spellsKnown"><b>Spells Known:</b><br/></span>
+      <div style="margin-left:15px;">
+          <div v-for="sla in chosenMonster.spellsKnown"><b>{{sla.name}} {{sla.casterLevel}} {{sla.concentration}}</b> <span style="text-decoration:underline;color:blue;margin-right: 5px;" v-on:click="openModalSpell(spell)" v-for="spell in sla.abilities">{{spell.trim()}}</span></div>    
+      </div>
+
+      <span v-if="chosenMonster.spellsPrepared"><b>Spells Prepared:</b><br/></span>
+      <div style="margin-left:15px;" v-if="chosenMonster.spellsPrepared">
+          <div v-for="sla in chosenMonster.spellsPrepared"><b>{{sla.name}} {{sla.casterLevel}} {{sla.concentration}}</b> <span style="text-decoration:underline;color:blue;margin-right: 5px;" v-on:click="openModalSpell(spell)" v-for="spell in sla.abilities">{{spell.trim()}}</span></div>
+      </div>
+      <span v-if="chosenMonster.spellDomains"><b>Domains:</b> {{chosenMonster.spellDomains}}   D domain spell</span>
+      <h4 class="monsterh4">STATISTICS</h4>
+      <span v-for="stat in chosenMonster.abilitiyScores"><b>{{stat.trim().substring(0,3)}}: </b>{{stat.trim().substring(3)}} </span><br/>
+      <b>Base Atk:</b> <span v-if="chosenMonster.baseAtk > 0">+</span> {{chosenMonster.baseAtk}} <b>CMB:</b> <span v-if="chosenMonster.cmb > 0">+</span> {{chosenMonster.cmb}} 
+      <b>CMD:</b>  {{chosenMonster.cmd}} <br/>
+      <b>Feats:</b> <span style="text-decoration:underline;color:blue;margin-right: 5px;" v-for="feat in chosenMonster.feats" v-on:click="openModal(feat)" >{{feat.trim()}}</span> &nbsp; <br/>
+      <b>Skills:</b> <span v-for="skill in chosenMonster.skills" v-on:click="loadSkill(skill)" style="text-decoration:underline;color:blue;margin-right: 5px;">{{skill}}</span><br/>
+      <b>Languages:</b> <span v-for="lang in chosenMonster.languages">{{lang}}</span><br/>
+      <b>SQ:</b> {{chosenMonster.sq}}<br/>
+      <b>Gear:</b> {{chosenMonster.gear}}<br/>
+      <b>Other Gear:</b> {{chosenMonster.otherGear}}<br/>
+      <h4 class="monsterh4">Special Abilities</h4>
+      {{chosenMonster.specialAbilities}}<br/>
+      
+      <h4 class="monsterh4">ECOLOGY</h4>
+      <b>Environment:</b> {{chosenMonster.environment}}<br/>
+      <b>Organization:</b> {{chosenMonster.org}}<br/>
+      <b>Treasure:</b> {{chosenMonster.treasure}} <a href="http://paizo.com/pathfinderRPG/prd/ultimateEquipment/appendix.html">Treasure Generator</a><br/>
+      <h4 class="monsterh4">DESCRIPTION</h4>
+      <span v-if="chosenMonster.description"><b>Description:</b> {{chosenMonster.description}}<br/></span>
+
+    
+      
+      <b>Source:</b> {{chosenMonster.source}}<br/>
+      <br/>
+
+  </div>
+</div>
+<feat-modal v-if="showModal" @close="showModal = false" :modalfeat="chosenFeat">
+
+</feat-modal>
+<skill-modal v-if="showModalSkill" @close="showModalSkill = false" :modalskill="chosenSkill">
+    
+    </skill-modal>
+  <spell-modal v-if="showModalSpell" @close="showModalSpell = false" :modalspell="chosenSpell">
+    
+  </spell-modal>
+
+</div>
+<script src="./js/what-input.js"></script>
+<script src="./js/foundation.js"></script>
+<script>
+String.prototype.startsWithI = function(s) {
+  return this.toLowerCase().startsWith(s.toLowerCase())
+}
+
+var sortMonsters = function(a, b) {
+   	if(a.name < b.name) return -1;
+    if(a.name > b.name) return 1;
+    return 0;
+  
+}
+
+var sortNumber = function(a,b) {
+    return a - b;
+}
+
+Vue.component('skill-modal', {
+  props: ['modalskill'],
+  template: '#skill-modal'  
+  
+})
+
+Vue.component('feat-modal', {
+  props: ['modalfeat'],
+  template: '#feat-modal'  
+  
+})
+
+Vue.component('spell-modal', {
+  props: ['modalspell'],
+  template: '#spell-modal'  
+  
+})
+
+const vm = new Vue({
+  el: '#app',
+  data: {
+    monsters: [],
+    currentMonsters: [],
+    showModal: false,
+    showModalSpell: false,
+    showModalSkill: false,
+    chosenMonster: '',
+    monsterFilter: '' ,
+    crs: [],
+    crSelected: "",
+    types: [],
+    envs:["Any", "Aquatic", "Coastline", "Desert", "Forest", "Hills", "Jungles", "Mountains", "Ocean", "Sea", "Plains", "River", "Lakes", "Marsh", "Swamp", "Underground", "City", "Urban", "Extraplanar"],
+    envSelected: "",
+    typeSelected: "",
+    feats: [],
+    chosenFeat: "",
+    spells: [],
+    chosenSpell: "",
+    skills: [],
+    chosenSkill: '',
+    umrs: [],
+    chosenUmr: ''
+       
+  },
+  methods: {
+    filterMonsters: function () { 
+      vm.currentMonsters = []; 
+      if(vm.monsterFilter) {
+        var arrayLength = vm.monsters.length;
+		    for (var i = 0; i < arrayLength; i++) {        
+		      if(vm.monsters[i].name.startsWithI(vm.monsterFilter)) {
+		    	  vm.currentMonsters.push(vm.monsters[i]);
+		      }
+    		}
+        vm.currentMonsters.sort(function(a, b){return sortMonsters(a,b)});
+      }	    
+    },
+    loadMonster: function(monster) {
+      vm.chosenMonster = monster;
+    },
+    populateCRs: function() {
+      var arrayLength = vm.monsters.length;
+      for (var i=0; i < arrayLength; i++) {
+        if(!vm.crs.includes(vm.monsters[i].cr)) {
+          vm.crs.push(vm.monsters[i].cr);
+        }
+      }
+      vm.crs.sort(sortNumber);
+    },
+    populateTypes: function() {
+      var arrayLength = vm.monsters.length;
+      for (var i=0; i < arrayLength; i++) {
+        if(!vm.types.includes(vm.monsters[i].type.trim().toLowerCase())) {
+          vm.types.push(vm.monsters[i].type.trim().toLowerCase());
+        }
+      }
+      vm.types.sort();
+    },
+    filterByCR: function() {
+      vm.currentMonsters = []; 
+      var arrayLength = vm.monsters.length;
+		    for (var i = 0; i < arrayLength; i++) {        
+		      if(vm.monsters[i].cr == (vm.crSelected)) {
+		    	  vm.currentMonsters.push(vm.monsters[i]);
+		      }
+    		}
+        vm.currentMonsters.sort(function(a, b){return sortMonsters(a,b)});
+    },
+    filterByType: function() {
+      vm.currentMonsters = []; 
+      var arrayLength = vm.monsters.length;
+		    for (var i = 0; i < arrayLength; i++) {        
+		      if(vm.monsters[i].type.toLowerCase() == (vm.typeSelected)) {
+		    	  vm.currentMonsters.push(vm.monsters[i]);
+		      }
+    		}
+        vm.currentMonsters.sort(function(a, b){return sortMonsters(a,b)});
+    },
+    filterByEnv: function() {
+      vm.currentMonsters = []; 
+      var arrayLength = vm.monsters.length;
+		    for (var i = 0; i < arrayLength; i++) {        
+		      if(vm.monsters[i].environment.toLowerCase().includes(vm.envSelected.toLowerCase())) {
+		    	  vm.currentMonsters.push(vm.monsters[i]);
+		      }
+    		}
+        vm.currentMonsters.sort(function(a, b){return sortMonsters(a,b)});
+    },
+    openModal: function(feat) {
+      var arrayLength = vm.feats.length;
+      var featName = feat.toLowerCase().trim();
+      if(featName.includes("(")) {
+        featName = featName.substring(0, featName.indexOf("("));
+        featName = featName.trim();
+      }
+      
+      for (var i = 0; i < arrayLength; i++) {        
+		      if(vm.feats[i].name.toLowerCase().startsWithI(featName)) {
+		    	  vm.chosenFeat = vm.feats[i];
+            break;
+		      }
+    		}
+       vm.showModal = true;
+    },
+    openModalSpell: function(spell) {
+      var arrayLength = vm.spells.length;
+      var spellName = spell.toLowerCase().trim();
+      if(spellName.includes("(")) {
+        spellName = spellName.substring(0, spellName.indexOf("("));
+        spellName = spellName.trim();
+      }
+      
+      for (var i = 0; i < arrayLength; i++) {        
+		      if(vm.spells[i].name.toLowerCase().startsWithI(spellName)) {
+		    	  vm.chosenSpell = vm.spells[i];
+            break;
+		      }
+    		}
+       vm.showModalSpell = true;
+    },
+    loadSkill: function(skill) {
+      var arrayLength = vm.skills.length;
+      var skillName = skill;
+      if(skillName.includes("(")) {
+        skillName = skillName.substring(0, skillName.indexOf("("));
+        skillName = skillName.trim();
+      }
+      if(skillName.includes("+")) {
+        skillName = skillName.substring(0, skillName.indexOf("+"));
+        skillName = skillName.trim();
+      }
+        console.log(skillName);
+        for (var i = 0; i < arrayLength; i++) {        
+		      if(vm.skills[i].name.toLowerCase().startsWithI(skillName)) {
+		    	  vm.chosenSkill = vm.skills[i];
+            break;
+		      }
+        }
+        vm.showModalSkill = true;
+      
+    }   
+  },
+  mounted() {
+    axios.get("./json/monsters.json")
+    .then(response => {this.monsters = response.data;
+     this.populateCRs();
+     this.populateTypes();
+    });
+    axios.get("./json/feats.json")
+    .then(response => {this.feats = response.data});
+    axios.get("./json/skills.json")
+    .then(response => {this.skills = response.data;    });
+    axios.get("./json/spells.json").then(
+      response => {this.spells = response.data;    
+    });
+  }
+});
+</script>
+</body>
+</html>

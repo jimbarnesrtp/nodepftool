@@ -9,6 +9,7 @@
   "author": "direrat@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.15.4"
+    "express": "^4.15.4",
+    "opn": "^5.1.0"
   }
 }

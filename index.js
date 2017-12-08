@@ -1,5 +1,6 @@
 var express = require('express')
 var app = express()
+const opn = require('opn');
 
 var myLogger = function (req, res, next) {
   console.log('LOGGED')
@@ -16,5 +17,5 @@ app.get('/', function (req, res) {
 })
 
 
-
+opn('http://localhost:3000/');
 app.listen(3000)

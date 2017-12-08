@@ -4,6 +4,7 @@
   <script src="./js/vuex.js"></script>
   <script src="./js/jquery-3.2.1.min.js"></script>
   <link rel="stylesheet" type="text/css" href="./css/app.css">
+  <link rel="stylesheet" type="text/css" href="./css/foundation.css">
 </head>
 <!-- template for the modal component -->
 <script type="text/x-template" id="modal-template">
@@ -20,18 +21,70 @@
 
           <div class="modal-body">
             <slot name="body">
-              Init: <input type="text" id="init2" :value="players[currentPlayer].init"><br/>
-              Bonus: <input type="text" id="bonus2" :value="players[currentPlayer].bonus" >
+              <div class="row">
+                <div class="column medium-6">
+                  Init: <input type="text" id="init2" :value="players[currentPlayer].init">
+                </div>
+                <div class="column medium-6">
+                  Bonus: <input type="text" id="bonus2" :value="players[currentPlayer].bonus" >
+                </div>
+              </div>
             </slot>
           </div>
 
           <div class="modal-footer">
             <slot name="footer">
               
-              <button class="modal-default-button" v-on:click="save();" @click="$emit('close')">
+              <button class="modal-default-button button" v-on:click="save();" @click="$emit('close')">
                 OK
               </button>
+              <br/>
+              <br/>
             </slot>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</script>
+<script type="text/x-template" id="modal-reset">
+  <transition name="modal-reset">
+    <div class="modal-mask">
+      <div class="modal-wrapper">
+        <div class="modal-container">
+
+          <div class="modal-header">
+            <slot name="header">
+              Modify {{ players[currentPlayer].name }} 
+              <button type="button" class="button" :disabled="currentPlayer == maxPlayers" style="float:right;margin-left:5px" v-on:click="modalChangeCharacter(currentPlayer+1)"> Forward </button>
+            <button style="float:right" :disabled="currentPlayer == 0" type="button" class="button" v-on:click="modalChangeCharacter(currentPlayer-1)"> back </button>
+            </slot>
+          </div>
+
+          <div class="modal-body">
+            <slot name="body">
+              <div class="row">
+                <div class="column medium-6">
+                  Init: <input type="text" id="init2" :value="players[currentPlayer].init">
+                </div>
+                <div class="column medium-6">
+                  Bonus: <input type="text" id="bonus2" :value="players[currentPlayer].bonus" >
+                </div>
+              </div>
+            </slot>
+          </div>
+
+          <div class="modal-footer">
+            <slot name="footer">
+              
+              <button class="modal-default-button button" v-on:click="save();" @click="$emit('close')">
+                OK
+              </button>
+              <br/>
+              <br/>
+            </slot>
+
           </div>
         </div>
       </div>
@@ -40,237 +93,108 @@
 </script>
 
 <body>
-Add Player:<br/>
-Name: <input type="text" id="name">  Init: <input type="text" id="init"> Bonus: <input type="text" id="bonus">
-<button type="button" id="addPlayer" onclick="addPlayer()">Add</button>
-<br/>
+
+
 
 <div id="app4" style="padding-top:10px">
 
-  <div style="float:left;min-width:300px;" >
-  <table border="1">
-    <tr>
-       <th>Character</th>
-       <th>Init</th>
-       <th>Bonus</th>
-    </tr>
-    <tr v-for="(player, index) in players" >
-      <td v-bind:class="{ active: readyPlayer(index) }" v-on:click="openModal(index)">{{ player.name }}</td> <td v-on:click="openModal(index)"> {{ player.init }}</td> <td v-on:click="openModal(index)">{{ player.bonus }}</td>
-    </tr>
-  </table>
-  </div>
-  <div style="margin-left:20px;float:left;">
-      <button type="button" v-on:click="showNextPlayer()" style="margin-bottom:5px;">Fight!</button><br/>
-      Round: {{ round }}
-  </div>
-  <div style="float:left;border:1px solid black;margin-left:20px;">
-     Conditions:<br/>
-     Add Condition:<br/>
-        Name: <input type="text" id="player">  Condition: <input type="text" id="conName"> Total Rounds: <input type="text" id="rounds">
-        <button type="button" id="addPlayer" v-on:click="addCondition()">Add</button>
+  <div class="row">
+    <div class="medium-4 column">
+      <div class="row">
+        <div class="medium-12 column">
+            Add Player:<br/>
+            Name: <input type="text" id="name">
+        </div>
+        <div class="medium-6 column">
+            Init: <input type="text" class="small-6" id="init">
+        </div>
+        <div class="medium-6 column">
+            Bonus: <input class="small-6" type="text" id="bonus">
+        </div>
+      </div>
+           
+        <button type="button" class="button" id="addPlayer" onclick="addPlayer()">Add</button>
         <br/>
-
-     <table border="1">
-    <tr>
-       <th>Character</th>
-       <th>Condition</th>
-       <th>Rounds Active</th>
-       <th>Total Rounds</th>
-
-    </tr>
-    <tr v-for="condition in conditions" >
-      <td>{{ condition.player }}</td> <td> {{ condition.name }}</td> <td>{{ condition.active }}</td> <td>{{ condition.total }}</td>
-    </tr>
-  </table>
+    </div>
+    <div class="medium-4 column">
+        Conditions:<br/>
+        Add Condition:<br/>
+        <div class="row">
+          <div class="medium-12 column">
+              Name: <input type="text" id="player">
+          </div>
+          <div class="medium-6 column">
+              Condition: 
+              <select id="conName" >
+                 <option value="">Choose</option>
+                 <option v-for="status in statuses" v-bind:value="status"> {{status}}</option>
+               </select>
+          </div>
+          <div class="column medium-6">
+              Total Rounds: <input type="text" id="rounds">
+              <button type="button" class="button" id="addPlayer" v-on:click="addCondition()">Add</button>
+          </div>
+        </div>
+    </div>
+    <div class="medium-4 column">
+        <table border="1">
+            <tr>
+               <th>Character</th>
+               <th>Condition</th>
+               <th>Rounds Active</th>
+               <th>Total Rounds</th>
+        
+            </tr>
+            <tr v-for="condition in conditions" >
+              <td>{{ condition.player }}</td> 
+              <td style="text-align:center"> {{ condition.name }}</td> 
+              <td style="text-align:center">{{ condition.active }}</td> 
+              <td style="text-align:center">{{ condition.total }}</td>
+            </tr>
+          </table>
+    </div>
   </div>
-  <div style="clear:both;"><p>
-  <button type="button" v-on:click="reset()">Reset Characters</button> &nbsp; <button type="button" v-on:click="clear()">Clear Characters</button>
-  </p>
+  
+  <div class="row align-center">
+    <div class="column medium-4">
+      <button type="button" class="button" v-on:click="reset()">Reset Characters</button> &nbsp; <button class="button" type="button" v-on:click="clear()">Clear Characters</button> 
+      &nbsp; <button type="button" class="button" v-on:click="openModalNewFight()">New Fight!</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="medium-12 column">
+      <table border="1" style="font-size:30px;">
+        <tr>
+           <th>Character</th>
+           <th>Init</th>
+           <th>Bonus</th>
+        </tr>
+        <tr v-for="(player, index) in players" >
+          <td v-bind:class="{ active: readyPlayer(index) }" v-on:click="openModal(index)">{{ player.name }}</td>
+           <td  style="text-align:center" v-on:click="openModal(index)"> {{ player.init }}</td> 
+           <td style="text-align:center" v-on:click="openModal(index)">{{ player.bonus }}</td>
+           <td style="text-align:center" v-on:click="deletePlayer(index)">Delete</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="row align-center">
+    <div class="column medium-3" style="text-align:center">
+        Round: {{ round }}
+        <button type="button" class="button" v-on:click="showNextPlayer()" style="margin-bottom:5px;">Fight!</button><br/>
+        
+    </div>
   </div>
   <modal v-if="showModal" @close="showModal = false">
 
   </modal>
-</div>
-
-<script type="text/javascript">
-const store = new Vuex.Store({
-  state: {
-    count: 0,
-    players: [],
-    currentPlayer: 0,
-    playerUp: -1,
-    round: 1,
-    conditions: []
-  },
-  mutations: {
-    increment (state) {
-      state.count++
-    },
-    addPlayer(state) {
-      state.players.push({ name: $('#name').val(), init: $('#init').val(), bonus: $('#bonus').val() });
-      state.players.sort(function(a, b){return sortPlayers(a,b)});
-      $('#name').val('');
-      $('#init').val('');
-      $('#bonus').val('');
-
-    },
-    setCurrentPlayer(state, n) {
-      state.currentPlayer = n;
-    },
-    updatePlayer(state, n) {
-      state.players[state.currentPlayer].bonus = n.bonus;
-      state.players[state.currentPlayer].init = n.init;
-      state.players.sort(function(a, b){return sortPlayers(a,b)});
-    },
-    reset(state) {
-      var arrayLength = state.players.length;
-      for (var i = 0; i < arrayLength; i++) {
-         state.players[i].bonus=0;
-         state.players[i].init=0;
-      } 
-      state.playerUp = -1;
-      state.round = 1;
-      state.conditions = [];
-    },
-    clear(state) {
-      state.players = [];
-      state.playerUp = -1;
-      state.round = 1;
-      state.conditions = [];
-    },
-    changePlayer(state) {
-      state.playerUp++;
-      if(state.playerUp < state.players.length) {
-        
-      } else {
-        state.playerUp = 0;
-        state.round++;
-        updateConditions();
-      }
-      
-    },
-    addCondition(state) {
-      state.conditions.push({ player: $('#player').val(), name: $('#conName').val(), total: $('#rounds').val(), active:0 });
-      $('#player').val('');
-      $('#conName').val('');
-      $('#rounds').val('');
-
-    }
+  <modal-reset v-if="showModalNewFight" @close="showModalNewFight = false">
     
-  },
-  actions: {
-    addPlayer (context) {      
-      context.commit('addPlayer');
-    },
-    setCurrentPlayer (context, n) {
-      context.commit('setCurrentPlayer', n);
-    },
-    updatePlayer (context, n) {
-      context.commit('updatePlayer', n);
-    },
-    addCondition(context) {
-      context.commit('addCondition');
-    }
-  }
-})
-
-
-Vue.component('modal', {
-  template: '#modal-template',
-  store,
-  methods: { 
-    save: function() {
-      store.dispatch('updatePlayer', {
-        init: $('#init2').val(),
-        bonus: $('#bonus2').val()
-      })
-      //store.players.sort(function(a, b){return sortPlayers(a,b)});
-    }
-  },
-  computed: {
-    players () {
-      return this.$store.state.players;
-    },
-    currentPlayer() {
-      return this.$store.state.currentPlayer;
-    }
-  }
-})
-
-var app4 = new Vue({
-  el: '#app4',
-  store,
-  data: {
-    showModal: false
-  },
-  methods: {
-    openModal(index) {
-       app4.showModal = true;
-       store.dispatch('setCurrentPlayer', index);
-    },
-    reset: function() {
-       store.commit('reset');
-    },
-    clear: function() {
-       store.commit('clear');
-    },
-    showNextPlayer() {
-       store.commit('changePlayer');
-    },
-    readyPlayer(index) {
-      if(index == this.$store.state.playerUp) {
-        return true;
-      } else {
-        return false;
-      }
-    },
-    addCondition() {
-      store.dispatch('addCondition');
-    }
-
-  },
-  computed: {
-    players () {
-      return this.$store.state.players;
-    },
-    currentPlayer() {
-
-      return this.$store.state.currentPlayer;
-    },
-    round() {
-      return this.$store.state.round;
-    },
-    conditions() {
-      return this.$store.state.conditions;
-    }
-  }
-
-})
-
-var itemNum = 4;
-var addPlayer = function() {
-	store.dispatch('addPlayer');
-}
-
-var sortPlayers = function(a, b) {
-  if(b.init==a.init) {
-        return b.bonus-a.bonus;
-    } else {
-      return b.init-a.init;
-    }
-
-}
-var updateConditions = function() {
-   var arrayLength = store.state.conditions.length;
-    for (var i = 0; i < arrayLength; i++) {
-      if(store.state.conditions[i].active < store.state.conditions[i].total) {        
-       store.state.conditions[i].active++;
-      } else {
-        store.state.conditions.splice(i,1);
-      }
-    }
-}
-</script>
+  </modal-reset>
+</div>
+<script src="./js/what-input.js"></script>
+<script src="./js/foundation.js"></script>
+<script src="./js/init.js"></script>
 
 
 
